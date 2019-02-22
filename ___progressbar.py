@@ -3,6 +3,7 @@
 from colorama import init
 init()
 
+
 class progressBar(object):
     def __init__(self, id, sum, width=30, color='red', char=' '):
         self.width = width
@@ -38,22 +39,28 @@ class progressBar(object):
         sumlen = str(self.__countNum(self.sum))
 
         if mass_end:
-            format_txt = '%03d: %3d%% |' + colors[color] + '%s\033[0m%s| %0' + sumlen + 'd/%0' + sumlen + 'd [ %s ]'
-            if len(bar) == 0: format_txt = '%03d: %3d%% |%s\033[0m%s| %0' + sumlen + 'd/%0' + sumlen + 'd [ %s ]'
-            print format_txt % (self.id, perc, bar, bar1, self.index, self.sum, mass_end)
+            format_txt = '%03d: %3d%% |' + \
+                colors[color] + '%s\033[0m%s| %0' + \
+                sumlen + 'd/%0' + sumlen + 'd [ %s ]'
+            if len(bar) == 0:
+                format_txt = '%03d: %3d%% |%s\033[0m%s| %0' + \
+                    sumlen + 'd/%0' + sumlen + 'd [ %s ]'
+            print format_txt % (self.id, perc, bar, bar1,
+                                self.index, self.sum, mass_end)
         else:
-            format_txt = '%03d: %3d%% |' + colors[color] + '%s\033[0m%s| %0' + sumlen + 'd/%0' + sumlen + 'd'
-            if len(bar) == 0: format_txt = '%03d: %3d%% |%s\033[0m%s| %0' + sumlen + 'd/%0' + sumlen + 'd'
+            format_txt = '%03d: %3d%% |' + \
+                colors[color] + '%s\033[0m%s| %0' + \
+                sumlen + 'd/%0' + sumlen + 'd'
+            if len(bar) == 0:
+                format_txt = '%03d: %3d%% |%s\033[0m%s| %0' + \
+                    sumlen + 'd/%0' + sumlen + 'd'
             print format_txt % (self.id, perc, bar, bar1, self.index, self.sum)
-
-
 
     def update(self, index, mass_end='', color=None):
         self.index = index
         if color is None:
             color = self.color
         self.__pbarprint(color, mass_end)
-
 
     def __placeSpace(self, words, space, left_align):
         count = space - len(words)

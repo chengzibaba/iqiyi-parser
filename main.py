@@ -17,7 +17,8 @@ import merger
 import urllib
 import time
 from ___progressbar import progressBar
-import os, pyperclip
+import os
+import pyperclip
 import iqiyi_parse
 import ConfigParser
 import json
@@ -27,7 +28,6 @@ global_bids = [100, 200, 300, 400, 500, 600]
 MAX_TASK = 5
 SAVE_PATH = ''
 DEL_AFTER = True
-
 
 
 def save_config():
@@ -60,8 +60,6 @@ def load_config():
     global_bids = json.loads(json_raw)
 
 
-
-
 def react_wait():
     while True:
         _input = raw_input('>>> ').lower()
@@ -69,6 +67,7 @@ def react_wait():
             return False
         if 'y' in _input and 'n' not in _input:
             return True
+
 
 def int_select_input(begin, end):
     while True:
@@ -82,6 +81,7 @@ def int_select_input(begin, end):
                 continue
             else:
                 return int(_input)
+
 
 def catch_url(last_url):
     last_clip = ''
@@ -105,6 +105,7 @@ def catch_url(last_url):
                 else:
                     return clip
 
+
 def make_filenames(filename, msg):
     names = []
     for i, j in enumerate(msg['fs']):
@@ -112,6 +113,7 @@ def make_filenames(filename, msg):
         names.append(name)
 
     return names
+
 
 def build_dl(videoname, names_list, sel_msg):
     dlm = nbdler.Manager()
@@ -125,10 +127,12 @@ def build_dl(videoname, names_list, sel_msg):
                 dlm.addHandler(dl)
             continue
 
-        dl = nbdler.open(filename=j, filepath=filepath, max_conn=5, urls=[_url])
+        dl = nbdler.open(filename=j, filepath=filepath,
+                         max_conn=5, urls=[_url])
         dlm.addHandler(dl)
 
     return dlm
+
 
 def dl_process(dlm):
     colors = ['red', 'blue', 'yellow', 'white', 'cyan', 'green', 'magenta']
@@ -155,8 +159,8 @@ def dl_process(dlm):
             speed = round(dl.getInsSpeed() / 1024, 1)
             pbars[i].update(inc, '%6s kb/s' % speed)
 
-
         time.sleep(1)
+
 
 def del_seg_video(name_paths, filepath):
     for i in name_paths:
@@ -219,7 +223,8 @@ def main():
         for i in names:
             name_paths.append(os.path.join(filepath, i))
 
-        mer = merger.merger(os.path.join(SAVE_PATH, unicode(videoname)) + u'.f4v', name_paths)
+        mer = merger.merger(os.path.join(
+            SAVE_PATH, unicode(videoname)) + u'.f4v', name_paths)
         mer.start()
         while True:
             merger_bar.update(mer.now)
@@ -238,5 +243,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-

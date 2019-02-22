@@ -2,15 +2,18 @@ import cookielib
 import random
 import time
 import re
-import gzip, zlib
+import gzip
+import zlib
 from io import BytesIO
 import json
-import urllib, urllib2
+import urllib
+import urllib2
 from BeautifulSoup import BeautifulSoup
 import PyV8
 import ssl
 
 ssl._create_default_https_context = ssl._create_unverified_context
+
 
 def raw_decompress(data, headers_msg):
     encoding = headers_msg.get('Content-Encoding')
@@ -21,9 +24,11 @@ def raw_decompress(data, headers_msg):
         data = zlib.decompress(data)
     return data
 
+
 HEADERS = {
     'Connection': 'keep-alive',
-    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36',
+    'User-Agent':
+    'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36',
     'Accept': '*/*',
     'Referer': 'http://www.iqiyi.com/',
     'Accept-Encoding': 'gzip, deflate',
@@ -62,8 +67,8 @@ global_params = {
     'callback': '',
 }
 
-class Iqiyi:
 
+class Iqiyi:
     def __init__(self):
         self.cookiejar = None
         self.opener = None
@@ -75,7 +80,8 @@ class Iqiyi:
 
     def init_opener(self):
         self.cookiejar = cookielib.CookieJar()
-        self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookiejar))
+        self.opener = urllib2.build_opener(
+            urllib2.HTTPCookieProcessor(self.cookiejar))
         self.opener.addheaders = list(HEADERS.items())
         self.QC005 = self.make_random_id()
         # self.uid = self.make_random_id()
@@ -83,11 +89,15 @@ class Iqiyi:
         self.set_cookie('QP001', self.QP001, 'iqiyi.com', '/')
 
     def set_cookie(self, name, value, domain, path):
-        self.cookiejar.set_cookie(cookielib.Cookie(0, name, value, None, False, domain, True, False, path, True, False,
-                                                   None, False, None, None, None))
+        self.cookiejar.set_cookie(
+            cookielib.Cookie(0, name, value, None, False, domain, True, False,
+                             path, True, False, None, False, None, None, None))
 
     def make_random_id(self):
-        chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f']
+        chars = [
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c',
+            'd', 'e', 'f'
+        ]
         id = ""
         for index in range(0, 32):
             id += chars[random.randint(0, 15)]
@@ -109,7 +119,8 @@ class Iqiyi:
         videoname = soup.title.string
         tvid = re.search('''param\['tvid'\] = "(.+?)"''', text, re.S).group(1)
         self.tvid = tvid
-        vid = re.search('''param\['vid'\] = "(.+?)"''', text, re.I | re.S).group(1)
+        vid = re.search('''param\['vid'\] = "(.+?)"''', text,
+                        re.I | re.S).group(1)
         uid = self.make_random_id()
 
         videos_msg = {}
@@ -129,7 +140,13 @@ class Iqiyi:
 
                     # for j, k in i:
                     # fs.append(i['fs'])
-            videos_msg[sel['scrsz']] = {'fs': sel['fs'], 'vsize': sel['vsize'], 'ff': sel['ff'], 'bid': sel['bid'], '@json': msg}
+            videos_msg[sel['scrsz']] = {
+                'fs': sel['fs'],
+                'vsize': sel['vsize'],
+                'ff': sel['ff'],
+                'bid': sel['bid'],
+                '@json': msg
+            }
 
         return videoname, videos_msg
 
@@ -147,9 +164,9 @@ class Iqiyi:
             ctx.enter()
             ctx.eval(js_context)
 
-            authkey = ctx.locals.authkey(ctx.locals.authkey('') + time_str + tvid)
+            authkey = ctx.locals.authkey(
+                ctx.locals.authkey('') + time_str + tvid)
             callback = ctx.locals.callback()
-
 
             params = {
                 'tvid': tvid,
@@ -170,7 +187,8 @@ class Iqiyi:
             path_get += '&vf=%s' % vf
             ctx.leave()
 
-        req = urllib2.Request('http://cache.video.iqiyi.com/' + path_get.lstrip('/'))
+        req = urllib2.Request('http://cache.video.iqiyi.com/' +
+                              path_get.lstrip('/'))
         res = self.opener.open(req)
         raw = res.read()
         text = raw_decompress(raw, res.info())
@@ -189,16 +207,18 @@ class Iqiyi:
             'qypid': '%s__02020031010000000000' % self.tvid,
             'rn': str(int(time.time() * 1000)),
             'pv': '0.1',
-
         }
         encode_params = urllib.urlencode(params)
 
-        req = urllib2.Request('http://data.video.iqiyi.com/videos/%s' % path.lstrip('/'), encode_params)
+        req = urllib2.Request(
+            'http://data.video.iqiyi.com/videos/%s' % path.lstrip('/'),
+            encode_params)
         res = self.opener.open(req)
         raw = res.read()
         text = raw_decompress(raw, res.info())
         msg = json.loads(text)
         return msg['l'], msg
+
 
 if __name__ == "__main__":
     a = Iqiyi()
